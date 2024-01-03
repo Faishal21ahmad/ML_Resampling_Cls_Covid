@@ -1,4 +1,9 @@
-## Clone 
+## Project Machine Learning
+Uji Perbandingan Kinerja Resampling Terhadap Model Klasifikasi Pada Ketidakseimbangan Dataset Covid-19.
+
+Tech Stack:.
+- Flask
+- Tailwind
 
 ### Note Project 
 
