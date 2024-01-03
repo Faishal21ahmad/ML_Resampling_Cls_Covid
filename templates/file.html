@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titel }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+
+</head>
+<body class="bg-slate-900 mx-auto">
+    <div class="mx-32 my-2">
+        <div id="div_header" class="p-4 bg-slate-300 rounded-md">
+            <h1 class="font-semibold text-2xl">{{ title }}</h1>
+        </div>
+        <div class="flex mt-3">
+            <!-- Navigasi Sidebar -->
+            <div id="navigasi" class="w-1/6 mr-3 bg-slate-300 rounded-md">
+                <div class="p-10">
+                    <img class="animate-bounce w-full h-full" src="{{ url_for('static', filename='/img/ML.png') }}">
+                </div>
+                <div class="w-10/12 h-1 bg-slate-400 mx-auto rounded-lg"></div>
+                <div class="p-2">
+                    <ul class="font-bold">
+                        <a href="{{ url_for('root') }}"><li class="p-2 hover:bg-slate-400 rounded-md cursor-pointer overflow-hidden">Accuracy</li></a>
+                        <a href="{{ url_for('compare') }}"><li class="p-2 hover:bg-slate-400 rounded-md cursor-pointer overflow-hidden">Compare</li></a>
+                        <a href="{{ url_for('predict') }}"><li class="p-2 hover:bg-slate-400 rounded-md cursor-pointer overflow-hidden">Predict</li></a>
+                        <a href="{{ url_for('file') }}"><li class="p-2 hover:bg-slate-400 rounded-md cursor-pointer overflow-hidden">File</li></a>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="content" class="w-full p-4 bg-slate-300 rounded-md overflow-hidden static">
+                {% if alert != null %}
+                    <div id="alert" class="absolute bg-slate-800 py-3 px-8 font-semibold text-white right-36 rounded-lg shadow-md transition ease-in-out backdrop-opacity-10">
+                        {{ alert }}
+                    </div>
+                {% endif %}
+
+                <table class="w-1/2">
+                    <thead class="bg-slate-800">
+                        <tr class="text-white">
+                            <th class="p-1 font-medium text-center rounded-tl-md">NO.</th>
+                            <th class="p-1 font-medium text-left">FILE</th>
+                            <th class="p-1 font-medium text-center rounded-tr-md">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in file %}
+                            <tr>
+                                <td class="p-1 font-medium text-center">{{ loop.index }}.</td>
+                                <td class="p-1 font-medium">{{ item['filename'] }}</td>
+                                <td class="p-1 font-medium text-center">
+                                    <form action="/file" method="POST">
+                                        <input class="hidden" id="itd" name="itd" type="text" value="{{ item['filename'] }}">
+                                        <button type="submit" class="py-1 px-5 bg-red-600 rounded-lg">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>  
+        </div>
+    </div>
+
+    <!-- JavaScript Dropdown -->
+
+    <script src="{{ url_for('static', filename='js/js.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titel }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+    <style>
+        .rotate-90 {
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+<body class="bg-slate-900 mx-auto">
+    <div class="mx-32 my-2">
+        <div id="div_header" class="p-4 bg-slate-300 rounded-md">
+            <h1 class="font-semibold text-2xl">{{ title }}</h1>
+        </div>
+        <div class="flex mt-3">
+            <!-- Navigasi Sidebar -->
+            <div id="navigasi" class="w-1/6 mr-3 bg-slate-300 rounded-md">
+                <div class="p-10">
+                    <img class="animate-bounce w-full h-full" src="{{ url_for('static', filename='/img/ML.png') }}">
+                </div>
+                <div class="w-10/12 h-1 bg-slate-400 mx-auto rounded-lg"></div>
+                <div class="p-2">
+                    <ul class="font-bold">
+                        <a href="{{ url_for('root') }}"><li class="p-2 hover:bg-slate-400 rounded-md cursor-pointer overflow-hidden">Accuracy</li></a>
+                        <a href="{{ url_for('compare') }}"><li class="p-2 hover:bg-slate-400 rounded-md cursor-pointer overflow-hidden">Compare</li></a>
+                        <a href="{{ url_for('predict') }}"><li class="p-2 hover:bg-slate-400 rounded-md cursor-pointer overflow-hidden">Predict</li></a>
+                        <a href="{{ url_for('file') }}"><li class="p-2 hover:bg-slate-400 rounded-md cursor-pointer overflow-hidden">File</li></a>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="content" class="w-full p-4 bg-slate-300 rounded-md overflow-hidden static">
+                <div class="flex">
+                    
+                    <!-- Input dan Select Data -->
+                    <div id="InputCSV" class="w-full">
+                        <h1 class="text-xl font-semibold p-1"> Input Data CSV </h1>
+                        <form action="/" method="POST" class="items-center" enctype="multipart/form-data">
+                            <div class="gap-1 flex flex-row-reverse justify-end">
+                                <label for="file" class="block cursor-pointer ">
+                                    <span class="sr-only">Choose File</span>
+                                    <input name="file" id="file" type="file" class="block w-full text-sm text-slate-500
+                                        file:mr-4 file:py-2 file:px-4
+                                        file:rounded-md file:border-0
+                                        file:text-sm file:font-semibold
+                                        file:bg-violet-50 file:text-slate-800
+                                        hover:file:bg-violet-100 cursor-pointer 
+                                    " required/>
+                                </label>
+                                <input type="hidden" name="proses" value="1">
+                                <button class="bg-slate-800 hover:bg-slate-500 px-4 py-1 text-white rounded-lg" type="submit">Upload</button>
+                            </div>
+                        </form>
+
+                        <!-- Select Label Klasifikasi -->
+                        <form action="/" method="POST" enctype="multipart/form-data" class="content-start mt-2 flex flex-row-reverse gap-1 justify-end">
+                            <div class="dropdown w-52"  id="myDropdown">
+                                <div id="tbl" onclick="openDropdown(`tbl`,`list`)"  class="flex w-full cursor-pointer rounded-lg p-2 bg-slate-800 hover:bg-slate-500 text-white font-medium selection::font-bold text-center mb-1 checked:bg-slate-700">
+                                    <p id="txtbtn" class="mx-auto">Label Klasifikasi</p>
+                                    <i class="fi fi-sr-caret-down flex text-center mt-0.5 mx-auto"></i>
+                                </div>
+                                <ul id="list" tabindex="0" class="dropdown-content hidden p-1 absolute w-52 max-h-96 menu shadow bg-base-100 rounded-box  bg-slate-700 rounded-lg overflow-y-scroll no-scrollbar">
+                                    {% for item in co %}
+                                        <li>
+                                            <input type="radio" id="{{ item }}" name="kls" value="{{ item }}" class="hidden peer">
+                                            <label id="itema" for="{{ item }}" class="py-2 inline-flex items-center justify-between w-full  rounded-md cursor-pointer  peer-checked:font-bold peer-checked:bg-slate-500 px-2 text-white  hover:bg-slate-700" onclick="closeDropDown(`tbl`,`list`,`{{ item }}`,`txtbtn`)">{{ item }}</label>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                            <input type="hidden" name="proses" value="2">
+                            <button class="bg-slate-800 hover:bg-slate-500 p-7 py-2 mb-1 text-white rounded-lg content-start" type="submit">Run</button>
+                        </form>
+                    </div>
+
+                    <!-- Informasi Data -->
+                    <div class="w-2/3 mt-9 flex bg-slate-800 p-2 text-white right-4 rounded-md">
+                        <div class="w-20">
+                            <p class="p-1">File</p>
+                            <p class="p-1">Kelas</p>
+                        </div>
+                        <div class="">
+                            {% if fil == 0 %}
+                                <p class="p-1 my-auto text-red-500 font-semibold">= File Tidak Ada</p>
+                            {% else %}
+                                <p class="p-1 my-auto text-white font-semibold">= {{ fil }}</p>   
+                            {% endif %}
+
+                            {% if cls == 0 %}
+                                <p class="p-1 my-auto text-red-500 font-semibold">=  Label Class Belum dipilih </p>
+                            {% else %}
+                                <p class="p-1 my-auto text-white font-semibold">=  {{ cls }}</p>   
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                {% if data != null %}
+                    <!-- Menampilkan Data CSV Seluruh Kolom -->
+                    <h1 class="text-xl font-semibold p-1">Total Colom Fiture : {{ i }} </h1>
+                    <div class="w-full h-44 bg-slate-800 rounded-lg overflow-scroll no-scrollbar ">
+                        <table class="">
+                            {% for row in data %}
+                                <tr class="">
+                                    {% for f in range(i) %}
+                                        <td class="pl-4 text-center text-white">{{ row[f] }}</td>
+                                    {% endfor %}
+                                </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                {% endif %}
+                {% if result != null %}
+                    <!-- Menampilkan Hasil Resempling -->
+                    <h1 class="mt-4 text-xl font-semibold p-1">Resampling Counter</h1>
+                    <div class="flex gap-2 w-full">
+                        {% for recount in resamcount %}
+                            <div class="mt-2 h-full w-full">
+                                <h1 class="p-1 bg-slate-800 rounded-tl-md font-semibold rounded-tr-md text-white text-center">{{ recount[0] }}</h1>
+                                <div class="">
+                                    <!-- <p>{{ recount[1] }}</p> -->
+                                    <p>1 = {{ recount[1][1] }}</p>
+                                    <p>0 = {{ recount[1][0] }}</p>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Menampilkan Score Accurasy -->
+                    <h1 class="mt-4 text-xl font-semibold p-1"> Results </h1>
+                    <table class="table-auto w-full">
+                        <thead class="">
+                            <tr class="bg-slate-700 text-white text-center rounded-2xl">
+                                <th class="p-1 rounded-tl-md">Algoritma</th>
+                                <th class="p-1">Oversampling</th>
+                                <th class="p-1">Data Split</th>
+                                <th class="p-1">Accuracy</th>
+                                <th class="p-1">Precision</th>
+                                <th class="p-1">Recall</th>
+                                <th class="p-1">Specificity</th>
+                                <th class="p-1">F1 Score</th>
+                                <th class="p-1">G-Mean</th>
+                                <th class="p-1">IBA </th>
+                                <th class="p-1 rounded-tr-md" >Support</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in result %}
+                                    <tr class="text-center">
+                                        <td class="bg-slate-400 cursor-pointer hover:bg-slate-500">{{ item[0] }}</td>
+                                        <td class="bg-slate-400 cursor-pointer hover:bg-slate-500">{{ item[1] }}</td>
+                                        <td class="bg-slate-400 cursor-pointer hover:bg-slate-500">{{ item[2] }}</td>
+                                        <td class="">{{ item[3] }} %</td>
+                                        <td class="">{{ item[4] }} %</td>
+                                        <td class="">{{ item[5] }} %</td>
+                                        <td class="">{{ item[6] }} %</td>
+                                        <td class="">{{ item[7] }} %</td>
+                                        <td class="">{{ item[8] }} %</td>
+                                        <td class="">{{ item[9] }} %</td>
+                                        <td class="">{{ item[10] }}</td>
+                                    </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>  
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/js.js') }}"></script>
+</body>
+</html>

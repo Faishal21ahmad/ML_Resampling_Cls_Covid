@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ titel }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-solid-rounded/css/uicons-solid-rounded.css'>
+</head>
+<body class="bg-slate-900 mx-auto">
+    <div class="mx-32 my-2">
+        <div id="div_header" class="p-4 bg-slate-300 rounded-md">
+            <h1 class="font-semibold text-2xl">{{ title }}</h1>
+        </div>
+        <div class="flex mt-3">
+            <!-- Navigasi Sidebar -->
+            <div id="navigasi" class="w-1/6 mr-3 bg-slate-300 rounded-md">
+                <div class="p-10">
+                    <img class="animate-bounce w-full h-full" src="{{ url_for('static', filename='/img/ML.png') }}">
+                </div>
+                <div class="w-10/12 h-1 bg-slate-400 mx-auto rounded-lg"></div>
+                <div class="p-2">
+                    <ul class="font-bold">
+                        <a href="{{ url_for('root') }}"><li class="p-2 hover:bg-slate-400 rounded-md cursor-pointer overflow-hidden">Accuracy</li></a>
+                        <a href="{{ url_for('compare') }}"><li class="p-2 hover:bg-slate-400 rounded-md cursor-pointer overflow-hidden">Compare</li></a>
+                        <a href="{{ url_for('predict') }}"><li class="p-2 hover:bg-slate-400 rounded-md cursor-pointer overflow-hidden">Predict</li></a>
+                        <a href="{{ url_for('file') }}"><li class="p-2 hover:bg-slate-400 rounded-md cursor-pointer overflow-hidden">File</li></a>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="content" class="w-full p-4 bg-slate-300 rounded-md overflow-hidden static">
+                <div class="">
+                    <div class="p-3">
+                        <h1 class="font-semibold text-2xl">Petunjuk Penggunaan</h1>
+                        <ol class="list-decimal list-inside">
+                            <li>Pilih File yang akan digunakan sebagai data Training</li>
+                            <li>Isi Form yang tampil dan Perhatikan Aturan Pengisian</li>
+                            <li>Hasil Akan Tampil Disebelah kanan form</li>
+                        </ol>
+                    </div>
+
+                    <form action="/predict" method="POST" class="content-start mt-2 flex flex-row-reverse gap-1 justify-end items-center" enctype="multipart/form-data">
+                        <p class="ml-4">{{ ti }}</p>
+                        <div class="w-64">
+                            <div id="tbl" onclick="openDropdown('tbl','list')" class="flex w-full cursor-pointer rounded-lg p-2 bg-slate-800 hover:bg-slate-500 text-white font-medium selection::font-bold text-center mb-1 checked:bg-slate-700 ">
+                                <p id="fileSelected" class="mx-auto">Select File</p>
+                                <i class="fi fi-sr-caret-down flex text-center mt-1 mx-auto"></i>
+                            </div>
+                            <ul id="list" tabindex="0" class="hidden p-1 absolute w-64 max-h-96 menu shadow bg-base-100 rounded-box  bg-slate-800 rounded-lg overflow-y-scroll no-scrollbar z-40">
+                                {% for item in file %}
+                                    <li>
+                                        <input type="radio" id="{{ item['filename'] }}" name="sel" value="{{ item['filename'] }}" class="hidden peer" required>
+                                        <label  for="{{ item['filename'] }}" class="py-2 inline-flex items-center justify-between w-full  rounded-md cursor-pointer  peer-checked:font-bold peer-checked:bg-slate-500 px-2 text-white  hover:bg-slate-700" onclick="closeDropDown('tbl','list', `{{ item['filename'] }}`, 'fileSelected')">              
+                                                {{ item['filename'] }}
+                                        </label>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <input type="hidden" name="proses" value="1">
+                        <button class="bg-slate-800 hover:bg-slate-500 p-7 py-2 mb-1 text-white rounded-lg content-start" type="submit">Select</button>
+                    </form>
+                    
+                {% if label != null %}
+                    <div class="p-4 ">
+                        <h1 class="font-semibold text-2xl">Aturan Pengisian</h1>
+                        <h2 class="text-sm">Aturan pengisian pertanyaan di bawah</h2>
+                        <ol class="list-decimal list-inside">
+                            {% for yy in label %}
+                                {% if yy == 'AGE' %}
+                                    <li class="text-sm">Age ===> 1 => 60 tahun, 0 => +60 tahun </li>
+                                {% endif %}
+                                {% if yy == 'DATE_DIED' %}
+                                    <li class="text-sm">DATE_DIED ===> 1 => Meninggal, 0 => Hidup</li>
+                                {% endif %}
+                                {% if yy == 'SEX' %}
+                                    <li class="text-sm">SEX ===> 1 => Laki - Laki, 0 => Perempuan</li>
+                                {% endif %}
+                            {% endfor %}
+                            <li class="text-sm">OTHER ===> 1 => IYA, 0 => Tidak</li>
+                        </ol>
+                    </div>
+                    
+                    <div class="flex">
+                        <form action="/predict" method="post" class="w-2/3">
+                            <div class="p-5 w-full ">
+                                <div class="grid grid-cols-1 2xl:grid-cols-2 gap-2">
+                                    {% for item in label %}
+                                    <div class="">
+                                        <h1 class="font-semibold text-lg">{{ loop.index }}. {{ item }}</h1>
+                                        <ul class="p-1 flex">
+                                            <li class="mx-1">
+                                                <input type="radio" id="ps{{ item }}" name="{{ item }}" value="1" class="hidden peer" required>
+                                                <label for="ps{{ item }}" class="inline-flex items-center justify-between py-1 px-6 text-gray-500 bg-slate-200 border border-gray-400 border-solid rounded-lg cursor-pointer peer-checked:border-slate-400 peer-checked:bg-slate-400 peer-checked:text-white hover:text-gray-600 hover:bg-gray-100 ">                           
+                                                    <div class="block">
+                                                        <div class="text-lg font-semibold">1</div>
+                                                    </div>
+                                                </label>
+                                            </li>
+                                            <li  class="mx-1">
+                                                <input type="radio" id="{{ item }}" name="{{ item }}" value="0" class="hidden peer">
+                                                <label for="{{ item }}" class="inline-flex items-center justify-between py-1 px-6 text-gray-500 bg-slate-200 border border-gray-400 border-solid rounded-lg cursor-pointer peer-checked:border-slate-400 peer-checked:bg-slate-400 peer-checked:text-white hover:text-gray-600 hover:bg-gray-100 ">
+                                                    <div class="block">
+                                                        <div class="text-lg font-semibold">0</div>
+                                                    </div>
+                                                </label>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <input type="hidden" name="proses" value="2">
+                                <div class="text-center p-4">
+                                    <button class="bg-slate-800 px-5 py-2 text-white font-semibold rounded-lg hover:bg-slate-500 active:bg-slate-600" type="submit"> Submit </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div class="p-4 w-full">
+                            <h1 class="font-semibold text-lg">Result</h1>
+                            <div class="bg-slate-800 rounded-lg p-4">
+                                <table class="text-white font-semibold">
+                                    <thead>
+                                        <tr>
+                                            <th>Metode</th>
+                                            <th>Predict</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for til in rs %}
+                                        <tr>
+                                            <td>{{ til[0] }}</td>
+                                            <td>{{ til[1] }}</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>    
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+                </div>
+            </div>  
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="{{ url_for('static', filename='js/js.js') }}"></script>
+</body>
+</html>
