@@ -1,2 +1,7 @@
 /node_modules
 /venv
+
+!*/data_input
+!*/label_list
+!*/model_training
+!*/result
